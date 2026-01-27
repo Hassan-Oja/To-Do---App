@@ -1,10 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_app/screens/home_screen.dart';
 import 'package:notes_app/screens/login_screen.dart';
 import '../widgets/custom_text_field.dart';
 
 class SigninScreen extends StatelessWidget {
-
   SigninScreen({super.key});
 
   GlobalKey<FormState> _formKey = GlobalKey();
@@ -12,7 +12,6 @@ class SigninScreen extends StatelessWidget {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
-
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +22,7 @@ class SigninScreen extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: width * 0.05),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Icon(
                 Icons.check_circle_outline,
@@ -44,23 +43,23 @@ class SigninScreen extends StatelessWidget {
                   children: [
                     CustomTextField(
                       hintText: 'Full Name',
-                      prefixIcon: Icons.person ,
+                      prefixIcon: Icons.person,
                       controller: fullNameController,
                       validator: (value) {
-                        if (value == null || value!.isEmpty ) {
+                        if (value == null || value!.isEmpty) {
                           return "Please enter your full name";
                         }
                         return null;
-                      }
+                      },
                     ),
                     CustomTextField(
                       hintText: 'Email',
-                      prefixIcon: Icons.email ,
+                      prefixIcon: Icons.email,
                       controller: emailController,
                       validator: (value) {
-                        if (value == null || value!.isEmpty ) {
+                        if (value == null || value!.isEmpty) {
                           return "Please enter your email";
-                        }else if(!value.contains('@')){
+                        } else if (!value.contains('@')) {
                           return "Please enter a valid email";
                         }
                         return null;
@@ -68,12 +67,12 @@ class SigninScreen extends StatelessWidget {
                     ),
                     CustomTextField(
                       hintText: 'Password',
-                      prefixIcon: Icons.lock ,
+                      prefixIcon: Icons.lock,
                       controller: passwordController,
                       validator: (value) {
-                        if (value == null || value!.isEmpty ) {
+                        if (value == null || value!.isEmpty) {
                           return "Please enter your password";
-                        }else if(value.length < 6){
+                        } else if (value.length < 6) {
                           return "Password must be at least 6 characters";
                         }
                         return null;
@@ -84,11 +83,11 @@ class SigninScreen extends StatelessWidget {
                       prefixIcon: Icons.lock,
                       controller: confirmPasswordController,
                       validator: (value) {
-                        if (value == null || value!.isEmpty ) {
+                        if (value == null || value!.isEmpty) {
                           return "Please enter your password";
-                        }else if(value.length < 6){
+                        } else if (value.length < 6) {
                           return "Password must be at least 6 characters";
-                        }else if(value != passwordController.text){
+                        } else if (value != passwordController.text) {
                           return "Passwords do not match";
                         }
                         return null;
@@ -100,12 +99,31 @@ class SigninScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
-                      );
+                  onPressed: () async {
+                    final isValid = _formKey.currentState!.validate();
+                    if (isValid) {
+                      try {
+                        await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                              email: emailController.text,
+                              password: passwordController.text,
+                            );
+                        // todo : go to home screen || Success Sign in
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                              (predicate) => false,
+                        );
+                      } on FirebaseAuthException catch (e) {
+                        print("--------------------${e.code}--------------");
+                        if (e.code == "email-already-in-use") {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Email already exists")),
+                          );
+                        }
+                      } catch (e) {
+                        print("error while signing up ${e.toString()}");
+                      }
                     }
                   },
                   child: Text("Sign Up", style: TextStyle(fontSize: 20)),
@@ -131,9 +149,10 @@ class SigninScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (context) => LoginScreen()),
+                        (predicate) => false,
                       );
                     },
                     child: Text(

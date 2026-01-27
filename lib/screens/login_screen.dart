@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_app/screens/sign_in_screen.dart';
 
@@ -20,7 +21,7 @@ class LoginScreen extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: width * 0.05),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Icon(
                 Icons.check_circle_outline,
@@ -44,7 +45,7 @@ class LoginScreen extends StatelessWidget {
                       prefixIcon: Icons.email,
                       controller: emailController,
                       validator: (value) {
-                        if (value == null || value!.isEmpty ) {
+                        if (value == null || value!.isEmpty) {
                           return "Please enter your email";
                         }
                         return null;
@@ -52,9 +53,9 @@ class LoginScreen extends StatelessWidget {
                     ),
                     CustomTextField(
                       validator: (value) {
-                        if (value == null || value!.isEmpty ) {
+                        if (value == null || value!.isEmpty) {
                           return "Please enter your password";
-                        }else if(value.length < 6){
+                        } else if (value.length < 6) {
                           return "Password must be at least 6 characters";
                         }
                         return null;
@@ -69,12 +70,35 @@ class LoginScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
-                      );
+                  onPressed: () async {
+                    final isValid = _formKey.currentState!.validate();
+                    if (isValid) {
+                      try {
+                        await FirebaseAuth.instance.signInWithEmailAndPassword(
+                          email: emailController.text,
+                          password: passwordController.text,
+                        );
+                        // todo : go to home screen || Success login
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                              (predicate) => false,
+                        );
+                      } on FirebaseAuthException catch (e) {
+                        print("--------------------${e.code}--------------");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              e.code,
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ),
+                        );
+                      } catch (e) {
+                        print(
+                          "==========> error while signing up ${e.toString()}",
+                        );
+                      }
                     }
                   },
                   child: Text("Log In", style: TextStyle(fontSize: 20)),
@@ -100,9 +124,10 @@ class LoginScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (context) => SigninScreen()),
+                        (predicate) => false,
                       );
                     },
                     child: Text(
