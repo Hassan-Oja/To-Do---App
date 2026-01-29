@@ -4,7 +4,7 @@ class CustomTextField extends StatelessWidget {
   String? hintText;
   IconData? prefixIcon;
   TextEditingController? controller;
-  String? Function(String?) validator;
+  String? Function(String?)? validator;
 
 
 
@@ -14,7 +14,7 @@ class CustomTextField extends StatelessWidget {
      required this.hintText,
      required this.prefixIcon,
      required this.controller,
-     required this.validator,
+      this.validator,
    });
 
   @override

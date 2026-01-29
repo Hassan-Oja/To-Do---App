@@ -1,7 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:notes_app/screens/home_screen.dart';
 import 'package:notes_app/screens/sign_in_screen.dart';
+import 'package:notes_app/viewModel/view_model.dart';
+
+// todo : global variable to access the view model
+var viewModel = ViewModel();
 
 void main() async {
   // todo: check if firebase is initialized
@@ -17,7 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SigninScreen(),
+      home: FirebaseAuth.instance.currentUser != null ? HomeScreen() : SigninScreen()
     );
   }
 }
