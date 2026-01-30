@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:notes_app/main.dart';
 
 import '../models/task_model.dart';
 
@@ -30,6 +31,12 @@ class ViewModel {
     //   id: "1235",
     // ),
   ];
+  // List<TaskModel> doneTasks = [];
+  // List<TaskModel> toDoTasks = [];
+
+  List<TaskModel> get doneTasks => tasks.where((element) => element.isCompleted == true).toList();
+  List<TaskModel> get toDoTasks => tasks.where((element) => element.isCompleted == false).toList();
+
 
   // Methods
   // CRUD
@@ -43,8 +50,6 @@ class ViewModel {
      "description" : task.description,
      "isCompleted" : task.isCompleted
    });
-
-
     // todo: Spread Operator to add new task to the list
     // tasks = [...tasks , task];
   }
@@ -94,7 +99,13 @@ class ViewModel {
           id: doc.id
       );
     }).toList();
-
+    // for(int i = 0 ; i < models.length ; i++){
+    //   if(task.isCompleted == true){
+    //     viewModel.doneTasks.add(models[i]);
+    //   }else{
+    //     viewModel.toDoTasks.add(models[i]);
+    //   }
+    // }
     tasks = models;
 
   }

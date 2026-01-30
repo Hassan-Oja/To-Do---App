@@ -6,6 +6,8 @@ import 'package:notes_app/widgets/custom_text_field.dart';
 import '../main.dart';
 import '../models/task_model.dart';
 import '../widgets/task_item.dart';
+import 'Tabs/done_tab.dart';
+import 'Tabs/to_do_tab.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -39,86 +41,88 @@ class _HomeScreenState extends State<HomeScreen> {
         .of(context)
         .size
         .height;
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          //todo : Show bottom sheet
-          newTask(context);
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(45)),
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        title: Text("Todo Screen"),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-              onPressed: () => showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text("Delete All Tasks"),
-                    content: Text("Are you sure you want to delete all tasks?"),
-                    actions: [
-                      TextButton(
-                        child: Text("Cancel"),
-                        onPressed: (){
-                          Navigator.pop(context);
-                        },
-                      ),
-                      TextButton(
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            //todo : Show bottom sheet
+            newTask(context);
+          },
+          child: Icon(Icons.add),
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(45)),
+        ),
+        appBar: AppBar(
+          bottom:  TabBar(
+            indicatorColor: Colors.white,
+            indicatorWeight: 4,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.grey,
+            labelStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            unselectedLabelStyle: TextStyle(fontSize: 16),
+            tabs: [
+              Tab(text: 'To Do Tasks'),
+              Tab(text: 'Done Tasks'),
+            ],
+          ),
+          backgroundColor: Colors.deepPurple,
+          title: Text("To Do App"),
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("Delete All Tasks"),
+                      content: Text("Are you sure you want to delete all tasks?"),
+                      actions: [
+                        TextButton(
+                          child: Text("Cancel"),
                           onPressed: (){
-                            deleteAllUserTasks();
-                            viewModel.tasks.clear();
                             Navigator.pop(context);
-                            setState(() {
-
-                            });
                           },
-                          child: Text(
-                            "Delete",
-                            style: TextStyle(color: Colors.red),
-                          )
-                      )
-                    ]
-                  );
+                        ),
+                        TextButton(
+                            onPressed: (){
+                              deleteAllUserTasks();
+                              viewModel.tasks.clear();
+                              Navigator.pop(context);
+                              setState(() {
 
-                }
-              )
-              ,
-              icon: Icon(Icons.delete)
-          ),
-          IconButton(
-              onPressed: () async{
-                await logout(context);
-                print("========>logout");
-              },
-              icon: Icon(Icons.logout
-              )
-          ),
-        ],
-      ),
-      body: ListView.builder(
-        padding: EdgeInsets.only(top: 20),
-        itemCount: viewModel.tasks.length,
-        itemBuilder: (context, index) {
-          return TaskItem(
-            isDone: () {
-              viewModel.taskStatus(index);
-              setState(() {});
-            },
-            model: viewModel.tasks[index],
-            removeTask: () {
-              // todo : delete task with id
-              viewModel.deleteTask(viewModel.tasks[index].id);
+                              });
+                            },
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(color: Colors.red),
+                            )
+                        )
+                      ]
+                    );
 
-              setState(() {});
-            },
-          );
-        },
+                  }
+                )
+                ,
+                icon: Icon(Icons.delete)
+            ),
+            IconButton(
+                onPressed: () async{
+                  await logout(context);
+                  print("========>logout");
+                },
+                icon: Icon(Icons.logout
+                )
+            ),
+          ],
+        ),
+        body:  TabBarView(
+          children: [
+            ToDoTab(),
+            DoneTab(),
+          ],
+        ),
       ),
     );
   }
