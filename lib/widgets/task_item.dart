@@ -5,11 +5,13 @@ import 'package:notes_app/models/task_model.dart';
 class TaskItem extends StatelessWidget {
 
   final VoidCallback removeTask;
+  final VoidCallback isDone;
   TaskModel model ;
    TaskItem({
     super.key,
     required this.model,
      required this.removeTask,
+     required this.isDone
   });
 
   @override
@@ -24,17 +26,27 @@ class TaskItem extends StatelessWidget {
             borderRadius: BorderRadiusGeometry.circular(25),
             side: BorderSide(color: Colors.grey,width: 2)
         ),
-        leading: Container(
-          child: model.isCompleted ? Icon(Icons.check,color: Colors.white,) : null,
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-            color: model.isCompleted ? Colors.deepPurple : null,
-            border: Border.all(
-                color: Colors.grey,
-                width: 2
+        leading: InkWell(
+          onTap: isDone,
+          //     () {
+          //   if(model.isCompleted) {
+          //     model.isCompleted = false;
+          //   } else {
+          //     model.isCompleted = true;
+          //   }
+          // }
+          child: Container(
+            child: model.isCompleted! ? Icon(Icons.check,color: Colors.white,) : null,
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: model.isCompleted! ? Colors.deepPurple : null,
+              border: Border.all(
+                  color: Colors.grey,
+                  width: 2
+              ),
+              shape: BoxShape.circle,
             ),
-            shape: BoxShape.circle,
           ),
         ),
         subtitle: model.description != null ? Text(model.description!) : null,

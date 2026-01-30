@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:notes_app/viewModel/view_model.dart';
+import 'package:notes_app/screens/sign_in_screen.dart';
 import 'package:notes_app/widgets/custom_text_field.dart';
-
 import '../main.dart';
 import '../models/task_model.dart';
 import '../widgets/task_item.dart';
@@ -14,10 +15,30 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  @override
+  void initState(){
+
+    // print(viewModel.tasks);
+    WidgetsBinding.instance.addPostFrameCallback((_)async{
+      await viewModel.getTasks();
+      setState(() {
+
+      });
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    var height = MediaQuery
+        .of(context)
+        .size
+        .height;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -34,8 +55,50 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text("Todo Screen"),
         foregroundColor: Colors.white,
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.logout)),
+          IconButton(
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text("Delete All Tasks"),
+                    content: Text("Are you sure you want to delete all tasks?"),
+                    actions: [
+                      TextButton(
+                        child: Text("Cancel"),
+                        onPressed: (){
+                          Navigator.pop(context);
+                        },
+                      ),
+                      TextButton(
+                          onPressed: (){
+                            deleteAllUserTasks();
+                            viewModel.tasks.clear();
+                            Navigator.pop(context);
+                            setState(() {
+
+                            });
+                          },
+                          child: Text(
+                            "Delete",
+                            style: TextStyle(color: Colors.red),
+                          )
+                      )
+                    ]
+                  );
+
+                }
+              )
+              ,
+              icon: Icon(Icons.delete)
+          ),
+          IconButton(
+              onPressed: () async{
+                await logout(context);
+                print("========>logout");
+              },
+              icon: Icon(Icons.logout
+              )
+          ),
         ],
       ),
       body: ListView.builder(
@@ -43,6 +106,10 @@ class _HomeScreenState extends State<HomeScreen> {
         itemCount: viewModel.tasks.length,
         itemBuilder: (context, index) {
           return TaskItem(
+            isDone: () {
+              viewModel.taskStatus(index);
+              setState(() {});
+            },
             model: viewModel.tasks[index],
             removeTask: () {
               // todo : delete task with id
@@ -64,11 +131,18 @@ class _HomeScreenState extends State<HomeScreen> {
       isScrollControlled: true,
       isDismissible: false,
       builder: (context) {
-        var mediaQuery = MediaQuery.of(context).viewInsets;
-        var width = MediaQuery.of(context).size.width;
-        var height = MediaQuery.of(context).size.height;
+        var mediaQuery = MediaQuery
+            .of(context)
+            .viewInsets;
+        var width = MediaQuery
+            .of(context)
+            .size
+            .width;
+        var height = MediaQuery
+            .of(context)
+            .size
+            .height;
 
-        // print(mediaQuery.bottom);
         return Padding(
           padding: EdgeInsets.only(bottom: mediaQuery.bottom),
           child: SizedBox(
@@ -94,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(height: height * 0.005),
                       CustomTextField(
                         hintText: "Task description",
-                        prefixIcon: Icons.task_alt,
+                        prefixIcon: Icons.description,
                         controller: _descriptionController,
                       ),
                       SizedBox(height: height * 0.05),
@@ -143,4 +217,33 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+  Future<void> deleteAllUserTasks() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
+    final tasksRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('userTasks');
+
+    final snapshot = await tasksRef.get();
+
+    final batch = FirebaseFirestore.instance.batch();
+
+    for (final doc in snapshot.docs) {
+      batch.delete(doc.reference);
+    }
+
+    await batch.commit();
+  }
+  Future<void> logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => SigninScreen()),
+          (_) => false,
+    );
+  }
+
+
 }

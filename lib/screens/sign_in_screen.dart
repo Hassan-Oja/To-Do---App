@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_app/screens/home_screen.dart';
@@ -103,11 +104,20 @@ class SigninScreen extends StatelessWidget {
                     final isValid = _formKey.currentState!.validate();
                     if (isValid) {
                       try {
-                        await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(
+                        final user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
                               email: emailController.text,
                               password: passwordController.text,
                             );
+
+                        final userID = user.user!.uid;
+                        // todo store the user in firebase
+                        await FirebaseFirestore.instance.collection("users").doc(userID).set(
+                          {
+                            "fullName" : fullNameController.text,
+                            "email" : emailController.text,
+                          }
+                        );
+
                         // todo : go to home screen || Success Sign in
                         Navigator.pushAndRemoveUntil(
                           context,

@@ -1,14 +1,13 @@
 class TaskModel {
-  String id ;
-  bool isCompleted;
+  String id;
+  bool? isCompleted;
   String title;
   String? description;
 
   TaskModel({
     required this.id,
-    required this.isCompleted,
+    this.isCompleted = false,
     required this.title,
-    required this.description
+    required this.description,
   });
-
 }
