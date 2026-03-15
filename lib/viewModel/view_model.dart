@@ -5,9 +5,7 @@ import 'package:notes_app/main.dart';
 import '../models/task_model.dart';
 
 class ViewModel {
-  List<TaskModel> tasks = [
-
-  ];
+  List<TaskModel> tasks = [];
 
   List<TaskModel> get doneTasks => tasks.where((element) => element.isCompleted == true).toList();
   List<TaskModel> get toDoTasks => tasks.where((element) => element.isCompleted == false).toList();
@@ -35,27 +33,28 @@ class ViewModel {
     FirebaseFirestore.instance.collection("users").doc(user).collection("userTasks").doc(task).delete();
 
     // todo : remove the task from the list
-    for(int i = 0 ; i < tasks.length ; i++) {
-      if(tasks[i].id == task) {
-        tasks.removeAt(i);
-        break;
-      };
-    };
+    tasks.removeWhere((element) => element.id == task);
+    // for(int i = 0 ; i < tasks.length ; i++) {
+    //   if(tasks[i].id == task) {
+    //     tasks.removeAt(i);
+    //     break;
+    //   };
+    // };
 
   }
-  void taskStatus(int index) async {
+  void taskStatus(TaskModel task) async {
     final userId = FirebaseAuth.instance.currentUser!.uid;
-    final taskModel = tasks[index];
+    // final taskModel = tasks[index];
 
-    taskModel.isCompleted = !taskModel.isCompleted!;
+    task.isCompleted = !task.isCompleted!;
 
     await FirebaseFirestore.instance
         .collection("users")
         .doc(userId)
         .collection("userTasks")
-        .doc(taskModel.id)
+        .doc(task.id)
         .update({
-      "isCompleted": taskModel.isCompleted,
+      "isCompleted": task.isCompleted,
     });
   }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../main.dart';
 import '../../widgets/task_item.dart';
 
@@ -13,20 +12,19 @@ class ToDoTab extends StatefulWidget {
 class _ToDoTabState extends State<ToDoTab> {
   @override
   Widget build(BuildContext context) {
-    return  ListView.builder(
-      padding: EdgeInsets.only(top: 20),
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 20),
       itemCount: viewModel.toDoTasks.length,
       itemBuilder: (context, index) {
+        final task = viewModel.toDoTasks[index];
         return TaskItem(
           isDone: () {
-            viewModel.taskStatus(index);
+            viewModel.taskStatus(task);
             setState(() {});
           },
-          model: viewModel.toDoTasks[index],
+          model: task,
           removeTask: () {
-            // todo : delete task with id
-            viewModel.deleteTask(viewModel.toDoTasks[index].id);
-
+            viewModel.deleteTask(task.id);
             setState(() {});
           },
         );
