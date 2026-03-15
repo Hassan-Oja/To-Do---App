@@ -45,7 +45,7 @@ class LoginScreen extends StatelessWidget {
                       prefixIcon: Icons.email,
                       controller: emailController,
                       validator: (value) {
-                        if (value == null || value!.isEmpty) {
+                        if (value == null || value.isEmpty) {
                           return "Please enter your email";
                         }
                         return null;
@@ -53,7 +53,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     CustomTextField(
                       validator: (value) {
-                        if (value == null || value!.isEmpty) {
+                        if (value == null || value.isEmpty) {
                           return "Please enter your password";
                         } else if (value.length < 6) {
                           return "Password must be at least 6 characters";

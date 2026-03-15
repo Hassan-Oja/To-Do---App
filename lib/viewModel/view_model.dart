@@ -6,33 +6,8 @@ import '../models/task_model.dart';
 
 class ViewModel {
   List<TaskModel> tasks = [
-    // TaskModel(
-    //   title: "First title",
-    //   description: "description",
-    //   isCompleted: true,
-    //   id: "123",
-    // ),
-    // TaskModel(
-    //   title: "Second title",
-    //   description: "second description",
-    //   isCompleted: true,
-    //   id: "19u4",
-    // ),
-    // TaskModel(
-    //   title: "First title",
-    //   description: "description",
-    //   isCompleted: false,
-    //   id: "1234",
-    // ),
-    // TaskModel(
-    //   title: "First title",
-    //   description: "description",
-    //   isCompleted: false,
-    //   id: "1235",
-    // ),
+
   ];
-  // List<TaskModel> doneTasks = [];
-  // List<TaskModel> toDoTasks = [];
 
   List<TaskModel> get doneTasks => tasks.where((element) => element.isCompleted == true).toList();
   List<TaskModel> get toDoTasks => tasks.where((element) => element.isCompleted == false).toList();
@@ -51,7 +26,7 @@ class ViewModel {
      "isCompleted" : task.isCompleted
    });
     // todo: Spread Operator to add new task to the list
-    // tasks = [...tasks , task];
+    //  tasks = [...tasks , task];
   }
   void deleteTask(String task) {
 

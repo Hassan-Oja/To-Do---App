@@ -151,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.only(bottom: mediaQuery.bottom),
           child: SizedBox(
             width: double.infinity,
-            height: height * 0.4,
+            height: height * 0.45,
             child: Column(
               children: [
                 SizedBox(height: height * 0.05),
